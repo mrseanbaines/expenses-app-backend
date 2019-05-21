@@ -3,14 +3,18 @@ const expenses = require('../data/expenses');
 
 const router = express.Router();
 
+const searchCriteria = ({ expense, searchQuery }) => expense.merchant.toLowerCase().includes(searchQuery.toLowerCase());
+
 // List expenses
 router.get('/', (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 25;
   const offset = parseInt(req.query.offset, 10) || 0;
   const sort = (req.query.sort || 'desc').toLowerCase();
+  const searchQuery = (req.query.search || '').toLowerCase();
 
   res.status(200).send({
     expenses: expenses
+      .filter(expense => searchCriteria({ expense, searchQuery }))
       .sort((a, b) => {
         const dateA = Date.parse(a.date);
         const dateB = Date.parse(b.date);
