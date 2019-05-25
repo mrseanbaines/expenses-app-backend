@@ -23,6 +23,8 @@ router.post('/', (req, res) => {
     return res.status(422).send('No category provided');
   }
 
+  category.name = category.name.trim();
+
   if (categories.some(cat => cat.name === category.name)) {
     return res.status(409).send('Category already exists');
   }
