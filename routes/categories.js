@@ -1,6 +1,7 @@
 const express = require('express');
 const uuidv4 = require('uuid/v4');
 let categories = require('../data/categories');
+const expenses = require('../data/expenses');
 
 const router = express.Router();
 
@@ -37,20 +38,22 @@ router.post('/', (req, res) => {
 });
 
 // Delete category
-router.delete('/', (req, res) => {
-  const { category } = req.body;
+router.delete('/:id', (req, res) => {
+  const category = categories.find(cat => cat.id === req.params.id);
 
   if (!category) {
-    return res.status(422).send('No category provided');
-  }
-
-  if (!categories.some(cat => cat.name === category.name)) {
     return res.status(404).send('Category not found');
   }
 
-  categories = categories.filter(cat => cat.name !== category.name);
+  expenses.forEach(expense => {
+    if (expense.category && expense.category.id === category.id) {
+      expense.category = null;
+    }
+  });
 
-  return res.status(201).send({ category, total: categories.length });
+  categories = categories.filter(cat => cat.id !== category.id);
+
+  return res.status(200).send({ category, expenses, total: categories.length });
 });
 
 module.exports = router;
