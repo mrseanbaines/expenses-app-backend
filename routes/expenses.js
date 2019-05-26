@@ -3,7 +3,13 @@ const expenses = require('../data/expenses');
 
 const router = express.Router();
 
-const searchCriteria = ({ expense, searchQuery }) => expense.merchant.toLowerCase().includes(searchQuery.toLowerCase());
+const searchFilter = ({ expense, searchQuery }) => {
+  return expense.merchant.toLowerCase().includes(searchQuery.toLowerCase());
+};
+
+const categoryFilter = ({ expense, categoryQueryId }) => {
+  return (expense.category && expense.category.id === categoryQueryId) || !categoryQueryId;
+};
 
 // List expenses
 router.get('/', (req, res) => {
@@ -11,9 +17,11 @@ router.get('/', (req, res) => {
   const offset = parseInt(req.query.offset, 10) || 0;
   const sort = (req.query.sort || 'desc').toLowerCase();
   const searchQuery = (req.query.search || '').toLowerCase();
+  const categoryQueryId = req.query.category || '';
 
   const results = expenses
-    .filter(expense => searchCriteria({ expense, searchQuery }))
+    .filter(expense => searchFilter({ expense, searchQuery }))
+    .filter(expense => categoryFilter({ expense, categoryQueryId }))
     .sort((a, b) => {
       const dateA = Date.parse(a.date);
       const dateB = Date.parse(b.date);

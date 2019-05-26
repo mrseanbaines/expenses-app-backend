@@ -47,6 +47,7 @@ router.delete('/:id', (req, res) => {
 
   expenses.forEach(expense => {
     if (expense.category && expense.category.id === category.id) {
+      // eslint-disable-next-line no-param-reassign
       expense.category = null;
     }
   });
