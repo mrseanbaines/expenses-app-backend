@@ -12,25 +12,26 @@ router.get('/', (req, res) => {
   const sort = (req.query.sort || 'desc').toLowerCase();
   const searchQuery = (req.query.search || '').toLowerCase();
 
-  res.status(200).send({
-    expenses: expenses
-      .filter(expense => searchCriteria({ expense, searchQuery }))
-      .sort((a, b) => {
-        const dateA = Date.parse(a.date);
-        const dateB = Date.parse(b.date);
+  const results = expenses
+    .filter(expense => searchCriteria({ expense, searchQuery }))
+    .sort((a, b) => {
+      const dateA = Date.parse(a.date);
+      const dateB = Date.parse(b.date);
 
-        switch (sort) {
-          case 'asc': {
-            return dateA - dateB;
-          }
-
-          default: {
-            return dateB - dateA;
-          }
+      switch (sort) {
+        case 'asc': {
+          return dateA - dateB;
         }
-      })
-      .slice(offset, offset + limit),
-    total: expenses.length,
+
+        default: {
+          return dateB - dateA;
+        }
+      }
+    });
+
+  res.status(200).send({
+    expenses: results.slice(offset, offset + limit),
+    total: results.length,
   });
 });
 
