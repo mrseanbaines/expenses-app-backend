@@ -8,6 +8,3 @@ node_modules/
 
 # Mac files
 .DS_Store
-
-# Asset directory
-api/receipts/
